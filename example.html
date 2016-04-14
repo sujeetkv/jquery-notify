@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Demo</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript" src="notify.js"></script>
+<script type="text/javascript">
+// example
+$(function(){
+	$.notify.setup({
+		'system_icon': 'info.png',
+		//'position': {'ver': 'top', 'hor': 'left'}
+	});
+	
+	$('#info').click(function(){
+		$.notify.info('info message', 4); // auto-close
+	});
+	$('#success').click(function(){
+		$.notify.success('success message', false); // persistent
+	});
+	$('#warning').click(function(){
+		$.notify.warning('warning message');
+	});
+	$('#error').click(function(){
+		$.notify.error('error message');
+	});
+	
+	$('#clear').click(function(){
+		$.notify.clear();
+	});
+	
+	$('#system_info').click(function(){
+		$.notify.system.info('info message');
+	});
+	$('#system_success').click(function(){
+		$.notify.system.success('success message');
+	});
+	$('#system_warning').click(function(){
+		$.notify.system.warning('warning message', 2); // auto-close
+	});
+	$('#system_error').click(function(){
+		$.notify.system.error('error message');
+	});
+	
+	$('#system_clear').click(function(){
+		$.notify.system.clear();
+	});
+});
+</script>
+</head>
+
+<body>
+<h1>Demo</h1>
+<button id="info">info</button>
+<button id="success">success</button>
+<button id="warning">warning</button>
+<button id="error">error</button>
+<br />
+<button id="clear">clear</button>
+
+<hr />
+
+<button id="system_info">system_info</button>
+<button id="system_success">system_success</button>
+<button id="system_warning">system_warning</button>
+<button id="system_error">system_error</button>
+<br />
+<button id="system_clear">system_clear</button>
+</body>
+</html>

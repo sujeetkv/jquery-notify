@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>Bootstrap Demo</title>
+
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css" integrity="sha512-dTfge/zgoMYpP7QbHy4gWMEGsbsdZeCXz7irItjcC3sPUFtf0kuFbDz/ixG7ArTxmDjLXDmezHubeNikyKGVyQ==" crossorigin="anonymous">
+	
+	<style type="text/css">
+	body {
+	  padding-top: 50px;
+	}
+	.starter-template {
+	  padding: 40px 15px;
+	  text-align: center;
+	}
+	</style>
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <a class="navbar-brand" href="#">Project name</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+          <ul class="nav navbar-nav">
+            <li class="active"><a href="#">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
+
+    <div class="container">
+
+      <div class="starter-template">
+        <h1>Bootstrap starter template</h1>
+        <p class="lead">
+		Use this document as a way to quickly start any new project.<br> All you get is this text and a mostly barebones HTML document.
+		<br>
+		
+		<button id="info" class="btn btn-primary">info</button>
+		<button id="success" class="btn btn-success">success</button>
+		<button id="warning" class="btn btn-warning">warning</button>
+		<button id="error" class="btn btn-danger">error</button>
+		<button id="clear" class="btn btn-default">clear</button>
+		</p>
+      </div>
+
+    </div><!-- /.container -->
+
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js" integrity="sha512-K1qjQ+NcF2TYO/eI3M6v8EiNYZfA95pQumfvcVrTHtwQVDG+aHRqLi/ETn2uB+1JqwYqVG3LIvdm9lj6imS/pQ==" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="notify.js"></script>
+
+<script type="text/javascript">
+// example for bootstrap
+$(function(){
+	$.notify.setup({
+		'system_icon': 'info.png',
+		'message_layout': '<div class="alert" role="alert"></div>',
+		'container_layout': '<div class=".col-md-6 .col-md-offset-6" style="padding:5px;"></div>'
+	});
+	
+	$('#info').click(function(){
+		$.notify.info('info message info message info message info message');
+	});
+	$('#success').click(function(){
+		$.notify.success('success message success message success message success message');
+	});
+	$('#warning').click(function(){
+		$.notify.warning('warning message warning message warning message warning message');
+	});
+	$('#error').click(function(){
+		$.notify.error('error message error message error message error message');
+	});
+	
+	$('#clear').click(function(){
+		$.notify.clear();
+	});
+});
+</script>
+</body>
+</html>
