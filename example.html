@@ -2,28 +2,49 @@
 <html>
 <head>
 <title>Demo</title>
-<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
-<script type="text/javascript" src="notify.js"></script>
+<script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+<script type="text/javascript" src="notify/notify.js"></script>
 <script type="text/javascript">
 // example
 $(function(){
 	$.notify.setup({
 		'app_title': 'Demo App',
 		'app_icon': 'info.png',
-		//'position': {'ver': 'top', 'hor': 'left'}
+		//'verbose_mode': true,
+		//'position': {'ver': 'top', 'hor': 'left'},
+		'service_worker_path': 'notify/service-worker.js' // to make system notification more compatible on mobile devices
 	});
 	
+	var info1 = null;
 	$('#info').click(function(){
-		$.notify.info('info message', 4); // auto-close
+		info1 = $.notify.info('info message', 4); // auto-close
 	});
+	$('#close_info').click(function(){
+		if(info1) info1.remove();
+	});
+	
+	var success1 = null;
 	$('#success').click(function(){
-		$.notify.success('success message', false); // persistent
+		success1 = $.notify.success('success message', false); // persistent
 	});
+	$('#close_success').click(function(){
+		if(success1) success1.remove();
+	});
+	
+	var warning1 = null;
 	$('#warning').click(function(){
-		$.notify.warning('warning message');
+		warning1 = $.notify.warning('warning message');
 	});
+	$('#close_warning').click(function(){
+		if(warning1) warning1.remove();
+	});
+	
+	var error1 = null;
 	$('#error').click(function(){
-		$.notify.error('error message');
+		error1 = $.notify.error('error message');
+	});
+	$('#close_error').click(function(){
+		if(error1) error1.remove();
 	});
 	
 	$('#clear').click(function(){
@@ -33,6 +54,7 @@ $(function(){
 	$('#system_info').click(function(){
 		$.notify.system.info('info message');
 	});
+	
 	$('#system_success').click(function(){
 		$.notify.system.success('success message');
 	});
@@ -52,10 +74,10 @@ $(function(){
 
 <body>
 <h1>Demo</h1>
-<button id="info">info</button>
-<button id="success">success</button>
-<button id="warning">warning</button>
-<button id="error">error</button>
+<button id="info">info</button><button id="close_info">close_info</button>
+<button id="success">success</button><button id="close_success">close_success</button>
+<button id="warning">warning</button><button id="close_warning">close_warning</button>
+<button id="error">error</button><button id="close_error">close_error</button>
 <br />
 <button id="clear">clear</button>
 

@@ -1,12 +1,12 @@
 /**
  * notify - jQuery notification system
- * v1.0
+ * v2.0
  * @author Sujeet <sujeetkv90@gmail.com>
  * @link https://github.com/sujeet-kumar/jquery-notify
  */
 
 (function($){
-	$.notify = (function($){
+	$.notify = (function(){
 		var _color = {
 			'info': '#31708F',
 			'success': '#3C763D',
@@ -29,7 +29,9 @@
 				'hor': 'right'
 			},
 			'container_layout': '<div style="padding:5px; margin:0px; width:400px;"></div>',
-			'message_layout': '<div style="border-radius:8px; box-shadow:0 0 5px rgba(51, 51, 51, 0.4); font-weight:bold; padding:10px; margin:8px 5px;"></div>'
+			'message_layout': '<div style="border-radius:8px; box-shadow:0 0 5px rgba(51, 51, 51, 0.4); font-weight:bold; padding:10px; margin:8px 5px;"></div>',
+			'service_worker_path': '',
+			'verbose_mode': false
 		};
 		
 		var _permissions = {
@@ -38,10 +40,10 @@
 			DENIED: 'denied'
 		};
 		
-		var _remove = function($node){
-			$node.fadeOut('fast', function(){
-				$(this).remove();
-			});
+		var _log = function(msg){
+			if(_settings.verbose_mode && console && 'log' in console){
+				console.log('notify.js: ' + msg);
+			}
 		};
 		
 		var _container = function(){
@@ -62,11 +64,17 @@
 			return $('div#__notify_container');
 		};
 		
-		var _remove_msg = function($node){
+		var _remove = function($element){
+			$element.fadeOut('fast', function(){
+				$(this).remove();
+			});
+		};
+		
+		var _remove_msg = function($msg_element){
 			if(_container().children().length < 2){
 				_remove(_container());
 			}else{
-				_remove($node);
+				_remove($msg_element);
 			}
 		};
 		
@@ -97,23 +105,63 @@
 		
 		var _default_api = {
 			'info': function(msg, temp){
-				_container().append(_template('info', msg, temp));
+				var $msg_tpl = _template('info', msg, temp);
+				_container().append($msg_tpl);
+				return {
+					'remove': function(){
+						_remove($msg_tpl);
+					}
+				};
 			},
 			'success': function(msg, temp){
-				_container().append(_template('success', msg, temp));
+				var $msg_tpl = _template('success', msg, temp);
+				_container().append($msg_tpl);
+				return {
+					'remove': function(){
+						_remove($msg_tpl);
+					}
+				};
 			},
 			'warning': function(msg, temp){
-				_container().append(_template('warning', msg, temp));
+				var $msg_tpl = _template('warning', msg, temp);
+				_container().append($msg_tpl);
+				return {
+					'remove': function(){
+						_remove($msg_tpl);
+					}
+				};
 			},
 			'error': function(msg, temp){
-				_container().append(_template('error', msg, temp));
+				var $msg_tpl = _template('error', msg, temp);
+				_container().append($msg_tpl);
+				return {
+					'remove': function(){
+						_remove($msg_tpl);
+					}
+				};
 			},
 			'clear': function(){
 				_remove(_container());
 			}
 		};
 		
-		var _sys_alerts = [];
+		var _has_service_worker = false;
+		
+		var _registerServiceWorker = function(service_worker_path){
+			if('serviceWorker' in navigator){
+				navigator.serviceWorker.register(service_worker_path).then(function(registration){
+					_has_service_worker = true;
+					_log('serviceWorker registration successful.');
+				}).catch(function(err){
+					_has_service_worker = false;
+					_log('serviceWorker registration warning: ' + err);
+				});
+			}else{
+				_log('serviceWorker not supported.');
+			}
+		};
+		
+		var _sys_alert_pool = [];
 		
 		var _notify_system = function(type, msg, temp){
 			var _title = $.trim(_settings.app_title + ' Alert: ' + type.charAt(0).toUpperCase() + type.substr(1));
@@ -121,18 +169,33 @@
 			var _options = {body: msg};
 			if(_settings.app_icon) _options.icon = _settings.app_icon;
 			
-			var _n = new Notification(_title, _options);
-			if(parseInt(temp) > 1){
-				setTimeout(_n.close.bind(_n), parseInt(temp) * 1000);
+			if(_has_service_worker === true){
+				navigator.serviceWorker.ready.then(function(registration){
+					registration.showNotification(_title, _options);
+					registration.getNotifications().then(function(notifications){
+						if(notifications.length){
+							var _n = notifications[notifications.length - 1];
+							if(parseInt(temp) > 1){
+								setTimeout(_n.close.bind(_n), parseInt(temp) * 1000);
+							}
+							_sys_alert_pool.push(_n);
+						}
+					});
+				});
+			}else{
+				var _n = new Notification(_title, _options);
+				if(parseInt(temp) > 1){
+					setTimeout(_n.close.bind(_n), parseInt(temp) * 1000);
+				}
+				_sys_alert_pool.push(_n);
 			}
-			_sys_alerts.push(_n);
 		};
 		
 		var _system_alert = function(type, msg, temp){
 			if('Notification' in window){
 				if(Notification.permission === _permissions.GRANTED){
 					_notify_system(type, msg, temp);
-				}else if(Notification.permission !== _permissions.DENIED){
+				}else if(Notification.permission !== _permissions.DENIED && !!Notification.requestPermission){
 					Notification.requestPermission(function(permission){
 						if(permission === _permissions.GRANTED){
 							_notify_system(type, msg, temp);
@@ -142,16 +205,18 @@
 					});
 				}else{
 					_default_api[type](msg, temp);
+					_log('Notification not allowed.');
 				}
 			}else{
 				_default_api[type](msg, temp);
+				_log('Notification not supported.');
 			}
 		};
 		
 		var _system_alert_clear = function(){
 			if('Notification' in window && Notification.permission === _permissions.GRANTED){
-				for(var _i in _sys_alerts){
-					_sys_alerts[_i].close();
+				for(var _i in _sys_alert_pool){
+					_sys_alert_pool[_i].close();
 				}
 			}else{
 				_default_api.clear();
@@ -183,8 +248,10 @@
 			if(options.message_layout) _settings.message_layout = options.message_layout;
 			if(options.position && options.position.ver) _settings.position.ver = options.position.ver;
 			if(options.position && options.position.hor) _settings.position.hor = options.position.hor;
+			if(options.service_worker_path) _registerServiceWorker(options.service_worker_path);
+			if('verbose_mode' in options) _settings.verbose_mode = !!options.verbose_mode;
 		};
 		
 		return _default_api;
-	})($);
+	})();
 }(jQuery));
