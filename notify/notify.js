@@ -109,7 +109,7 @@
 				_container().append($msg_tpl);
 				return {
 					'remove': function(){
-						_remove($msg_tpl);
+						_remove_msg($msg_tpl);
 					}
 				};
 			},
@@ -118,7 +118,7 @@
 				_container().append($msg_tpl);
 				return {
 					'remove': function(){
-						_remove($msg_tpl);
+						_remove_msg($msg_tpl);
 					}
 				};
 			},
@@ -127,7 +127,7 @@
 				_container().append($msg_tpl);
 				return {
 					'remove': function(){
-						_remove($msg_tpl);
+						_remove_msg($msg_tpl);
 					}
 				};
 			},
@@ -136,7 +136,7 @@
 				_container().append($msg_tpl);
 				return {
 					'remove': function(){
-						_remove($msg_tpl);
+						_remove_msg($msg_tpl);
 					}
 				};
 			},
