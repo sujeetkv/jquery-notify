@@ -205,11 +205,11 @@
 					});
 				}else{
 					_default_api[type](msg, temp);
-					_log('Notification not allowed.');
+					_log('System Notification not allowed.');
 				}
 			}else{
 				_default_api[type](msg, temp);
-				_log('Notification not supported.');
+				_log('System Notification not supported.');
 			}
 		};
 		
@@ -238,6 +238,24 @@
 			},
 			'clear': function(){
 				_system_alert_clear();
+			}
+		};
+		
+		_default_api.system.requestPermission = function(){
+			if('Notification' in window && !!Notification.permission && !!Notification.requestPermission){
+				if(Notification.permission === _permissions.DEFAULT){
+					Notification.requestPermission(function(permission){
+						if(permission === _permissions.GRANTED){
+							_log('Permission Granted !');
+						}else{
+							_log('Permission not Granted !');
+						}
+					});
+				}else{
+					_log('Permission already requested: ' + Notification.permission.toUpperCase());
+				}
+			}else{
+				_log('System Notification not supported.');
 			}
 		};
 		

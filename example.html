@@ -15,6 +15,8 @@ $(function(){
 		'service_worker_path': 'notify/service-worker.js' // to make system notification more compatible on mobile devices
 	});
 	
+	$.notify.system.requestPermission(); // request system notification permission (optional)
+	
 	var info1 = null;
 	$('#info').click(function(){
 		info1 = $.notify.info('info message', 4); // auto-close
@@ -52,7 +54,7 @@ $(function(){
 	});
 	
 	$('#system_info').click(function(){
-		$.notify.system.info('info message');
+		$.notify.system.info('This is demo info. This is demo info. This is demo info. This is demo info.');
 	});
 	
 	$('#system_success').click(function(){
