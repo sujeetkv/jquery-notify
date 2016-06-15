@@ -28,6 +28,7 @@
 				'ver': 'bottom',
 				'hor': 'right'
 			},
+			'z_index': '2048',
 			'container_layout': '<div style="padding:5px; margin:0px; width:400px;"></div>',
 			'message_layout': '<div style="border-radius:8px; box-shadow:0 0 5px rgba(51, 51, 51, 0.4); font-weight:bold; padding:10px; margin:8px 5px;"></div>',
 			'service_worker_path': '',
@@ -52,7 +53,7 @@
 				$_container_layout.attr('id', '__notify_container');
 				
 				var _container_css = {
-					'z-index': '1024',
+					'z-index': _settings.z_index,
 					'position': 'fixed'
 				};
 				_container_css[_settings.position.ver] = '0';
@@ -164,7 +165,7 @@
 		var _sys_alert_pool = [];
 		
 		var _notify_system = function(type, msg, temp){
-			var _title = $.trim(_settings.app_title + ' Alert: ' + type.charAt(0).toUpperCase() + type.substr(1));
+			var _title = $.trim(_settings.app_title + ': ' + type.charAt(0).toUpperCase() + type.substr(1));
 			
 			var _options = {body: msg};
 			if(_settings.app_icon) _options.icon = _settings.app_icon;
@@ -266,6 +267,7 @@
 			if(options.message_layout) _settings.message_layout = options.message_layout;
 			if(options.position && options.position.ver) _settings.position.ver = options.position.ver;
 			if(options.position && options.position.hor) _settings.position.hor = options.position.hor;
+			if(options.z_index) _settings.z_index = options.z_index;
 			if(options.service_worker_path) _registerServiceWorker(options.service_worker_path);
 			if('verbose_mode' in options) _settings.verbose_mode = !!options.verbose_mode;
 		};
