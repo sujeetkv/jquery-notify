@@ -65,7 +65,7 @@ $(function(){
 		$.notify.system.warning('warning message', 2); // auto-close
 	});
 	$('#system_error').click(function(){
-		$.notify.system.error('error message');
+		$.notify.system.error('error message', false, 'Custom Title', 'logo.jpg');
 	});
 	
 	$('#system_clear').click(function(){
