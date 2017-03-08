@@ -36,20 +36,14 @@
             'verbose_mode': false
         };
         
-        var permissions = {
-            DEFAULT: 'default',
-            GRANTED: 'granted',
-            DENIED: 'denied'
-        };
-        
         var log = function (msg) {
             if (settings.verbose_mode && console && 'log' in console) {
-                console.log('notify.js: ' + msg);
+                console.log('notify.js:> ' + msg);
             }
         };
         
         var container = function () {
-            if (!($('div#__notifycontainer').length)) {
+            if (!$('div#__notifycontainer').length) {
                 var $container_layout = $(settings.container_layout);
                 $container_layout.attr('id', '__notifycontainer');
                 
@@ -148,11 +142,19 @@
         
         var has_service_worker = false;
         
+        var permissions = {
+            DEFAULT: 'default',
+            GRANTED: 'granted',
+            DENIED: 'denied'
+        };
+        
+        var sys_alert_pool = [];
+        
         var registerServiceWorker = function (service_worker_path) {
             if ('serviceWorker' in navigator) {
                 navigator.serviceWorker.register(service_worker_path).then(function (registration) {
                     has_service_worker = true;
-                    log('serviceWorker registration successful.');
+                    log('serviceWorker registration successful having scope: ' + registration.scope);
                 }).catch(function (err) {
                     has_service_worker = false;
                     log('serviceWorker registration warning: ' + err);
@@ -162,9 +164,8 @@
             }
         };
         
-        var sys_alert_pool = [];
-        
         var notify_system = function (type, msg, temp, title, icon) {
+            temp = (typeof temp === 'undefined') ? true : temp;
             title = title || $.trim(settings.app_title + ': ' + type.charAt(0).toUpperCase() + type.substr(1));
             icon = icon || settings.app_icon;
             
@@ -174,18 +175,27 @@
                 options.icon = icon;
             }
             
+            if (!temp) {
+                options.requireInteraction = true;
+            }
+            
             if (has_service_worker === true) {
                 navigator.serviceWorker.ready.then(function (registration) {
-                    registration.showNotification(title, options);
-                    registration.getNotifications().then(function (notifications) {
-                        if (notifications.length) {
-                            var n = notifications[notifications.length - 1];
-                            if (parseInt(temp) > 1) {
-                                setTimeout(n.close.bind(n), parseInt(temp) * 1000);
+                    
+                    registration.showNotification(title, options).then(function () {
+                        
+                        registration.getNotifications().then(function (notifications) {
+                            if (notifications.length) {
+                                var n = notifications[notifications.length - 1];
+                                if (parseInt(temp) > 1) {
+                                    setTimeout(n.close.bind(n), parseInt(temp) * 1000);
+                                }
+                                sys_alert_pool.push(n);
                             }
-                            sys_alert_pool.push(n);
-                        }
+                        });
+                        
                     });
+                    
                 });
             } else {
                 var n = new Notification(title, options);
@@ -200,8 +210,10 @@
             if ('Notification' in window) {
                 if (Notification.permission === permissions.GRANTED) {
                     notify_system(type, msg, temp, title, icon);
-                } else if (Notification.permission !== permissions.DENIED && !!Notification.requestPermission) {
+                } else if (Notification.permission !== permissions.DENIED && Notification.requestPermission) {
                     Notification.requestPermission(function (permission) {
+                        permissionRequestCallback(permission);
+                        
                         if (permission === permissions.GRANTED) {
                             notify_system(type, msg, temp, title, icon);
                         } else {
@@ -246,15 +258,34 @@
             }
         };
         
-        default_api.system.requestPermission = function () {
-            if ('Notification' in window && !!Notification.permission && !!Notification.requestPermission) {
+        default_api.system.onPermissionGranted = function () {};
+        default_api.system.onPermissionDenied = function () {};
+        
+        var permissionRequestCallback = function (permission, onGrantedCallback, onDeniedCallback) {
+            onGrantedCallback = onGrantedCallback || default_api.system.onPermissionGranted;
+            onDeniedCallback = onDeniedCallback || default_api.system.onPermissionDenied;
+
+            switch (permission) {
+                case permissions.GRANTED:
+                    log('Permission Granted !');
+                    if (typeof onGrantedCallback === 'function') {
+                        onGrantedCallback();
+                    }
+                    break;
+                case permissions.DENIED:
+                    log('Permission Denied !');
+                    if (typeof onDeniedCallback === 'function') {
+                        onDeniedCallback();
+                    }
+                    break;
+            };
+        };
+        
+        default_api.system.requestPermission = function (onGranted, onDenied) {
+            if ('Notification' in window && Notification.permission && Notification.requestPermission) {
                 if (Notification.permission === permissions.DEFAULT) {
                     Notification.requestPermission(function (permission) {
-                        if (permission === permissions.GRANTED) {
-                            log('Permission Granted !');
-                        } else {
-                            log('Permission not Granted !');
-                        }
+                        permissionRequestCallback(permission, onGranted, onDenied);
                     });
                 } else {
                     log('Permission already requested: ' + Notification.permission.toUpperCase());

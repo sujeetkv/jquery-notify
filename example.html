@@ -10,13 +10,16 @@ $(function(){
 	$.notify.setup({
 		'app_title': 'Demo App',
 		'app_icon': 'info.png',
-		//'verbose_mode': true,
+		'verbose_mode': true,
 		//'position': {'ver': 'top', 'hor': 'left'},
 		//'z_index': '2048',
 		'service_worker_path': 'src/service-worker.js' // to make system notification more compatible on mobile devices
 	});
 	
-	$.notify.system.requestPermission(); // request system notification permission (optional)
+        // request system notification permission (optional)
+        $.notify.system.onPermissionGranted = function () {console.log('granted callback');};
+        $.notify.system.onPermissionDenied = function () {console.log('denied callback');};
+	$.notify.system.requestPermission();
 	
 	var info1 = null;
 	$('#info').click(function(){
@@ -59,13 +62,13 @@ $(function(){
 	});
 	
 	$('#system_success').click(function(){
-		$.notify.system.success('success message');
+		$.notify.system.success('success message', false); // persistent (require interaction to close)
 	});
 	$('#system_warning').click(function(){
 		$.notify.system.warning('warning message', 2); // auto-close
 	});
 	$('#system_error').click(function(){
-		$.notify.system.error('error message', false, 'Custom Title', 'logo.jpg');
+		$.notify.system.error('error message', true, 'Custom Title', 'logo.jpg');
 	});
 	
 	$('#system_clear').click(function(){
