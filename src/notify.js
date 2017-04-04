@@ -186,7 +186,7 @@
                         
                         registration.getNotifications().then(function (notifications) {
                             if (notifications.length) {
-                                var n = notifications[notifications.length - 1];
+                                var n = notifications[(notifications.length - 1)];
                                 if (parseInt(temp) > 1) {
                                     setTimeout(n.close.bind(n), parseInt(temp) * 1000);
                                 }
