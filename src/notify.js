@@ -33,6 +33,7 @@
             'container_layout': '<div style="padding:5px; margin:0px; width:400px;"></div>',
             'message_layout': '<div style="border-radius:8px; box-shadow:0 0 5px rgba(51, 51, 51, 0.4); font-weight:bold; padding:10px; margin:8px 5px;"></div>',
             'service_worker_path': '',
+            'service_worker_scope': './src/',
             'verbose_mode': false
         };
         
@@ -152,7 +153,7 @@
         
         var registerServiceWorker = function (service_worker_path) {
             if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.register(service_worker_path).then(function (registration) {
+                navigator.serviceWorker.register(service_worker_path, {scope: settings.service_worker_scope}).then(function (registration) {
                     has_service_worker = true;
                     log('serviceWorker registration successful having scope: ' + registration.scope);
                 }).catch(function (err) {
@@ -316,6 +317,9 @@
             }
             if (options.z_index) {
                 settings.z_index = options.z_index;
+            }
+            if (options.service_worker_scope) {
+                settings.service_worker_scope = options.service_worker_scope;
             }
             if (options.service_worker_path) {
                 registerServiceWorker(options.service_worker_path);
