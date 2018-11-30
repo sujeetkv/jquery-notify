@@ -3,7 +3,7 @@
  * v2.0
  * 
  * @author Sujeet <sujeetkv90@gmail.com>
- * @link https://github.com/sujeet-kumar/jquery-notify
+ * @link https://github.com/sujeetkv/jquery-notify
  */
 
 (function ($) {
